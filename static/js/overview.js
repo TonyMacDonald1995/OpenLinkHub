@@ -2118,8 +2118,11 @@ $(document).ready(function () {
         }
 
         const keyboardRgbProfile = $('.keyboardRgbProfile');
-        if (keyboardRgbProfile.length > 0 && typeof deviceProfile.RGBProfile === "string") {
-            const rgbProfileValue = "0;" + deviceProfile.RGBProfile;
+        if (keyboardRgbProfile.length > 0 && typeof (deviceProfile.RGBProfile === "string") || deviceProfile.SlipstreamRGBProfile === "string") {
+            let rgbProfileValue = "0;" + deviceProfile.RGBProfile;
+            if (deviceProfile.SlipstreamRGBProfile.length > 0) {
+                rgbProfileValue = "0;" + deviceProfile.SlipstreamRGBProfile;
+            }
             if (keyboardRgbProfile.find('option[value="' + rgbProfileValue + '"]').length > 0) {
                 keyboardRgbProfile.val(rgbProfileValue);
             }
@@ -2284,6 +2287,10 @@ $(document).ready(function () {
             }
 
             const liveToggle = $(".toggleKeyboardLiveSync");
+            if (liveToggle.length === 0) {
+                return
+            }
+
             if (liveToggle.length > 0 && !liveToggle.is(":checked")) {
                 return;
             }

@@ -1098,7 +1098,6 @@ func (d *Device) ProcessSetRgbCluster(enabled bool) uint8 {
 			LedChannels:  uint32(colorPacketLength),
 			WriteColorEx: d.writeColorCluster,
 		}
-
 		cluster.Get().AddDeviceController(clusterController)
 	} else {
 		cluster.Get().RemoveDeviceControllerBySerial(d.Serial)
@@ -1653,6 +1652,12 @@ func (d *Device) setDeviceColor() {
 		d.DeviceProfile.RGBProfile = "keyboard"
 	}
 
+	// RGB Cluster
+	if d.DeviceProfile.RGBCluster {
+		logger.Log(logger.Fields{}).Info("Exiting setDeviceColor() due to RGB Cluster")
+		return
+	}
+	
 	if d.DeviceProfile.RGBProfile == "keyboard" {
 		var buf = make([]byte, colorPacketLength)
 		if _, ok := d.DeviceProfile.Keyboards[d.DeviceProfile.Profile]; ok {
