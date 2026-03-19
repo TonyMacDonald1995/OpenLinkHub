@@ -897,18 +897,15 @@ func SaveJsonData(path string, data interface{}) error {
 	if fileErr != nil {
 		return fileErr
 	}
+	defer func(file *os.File) {
+		err := file.Close()
+		if err != nil {
+
+		}
+	}(file)
 
 	_, err = file.Write(buffer)
-	if err != nil {
-		return err
-	}
-
-	err = file.Close()
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 // InRange will validate if value is in range
