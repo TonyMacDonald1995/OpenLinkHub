@@ -310,17 +310,19 @@ func (d *Device) StopDirty() uint8 {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	if !value {
-		cluster.Get().RemoveDeviceControllerBySerial(d.Serial)
-		openrgb.RemoveDeviceControllerBySerial(d.Serial)
-	}
+	if d.Connected {
+		if !value {
+			cluster.Get().RemoveDeviceControllerBySerial(d.Serial)
+			openrgb.RemoveDeviceControllerBySerial(d.Serial)
+		}
 
-	if d.activeRgb != nil {
-		d.activeRgb.Exit <- true
-		d.activeRgb = nil
+		if d.activeRgb != nil {
+			d.activeRgb.Exit <- true
+			d.activeRgb = nil
+		}
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
 	}
-
-	d.Connected = value
 }
 
 // checkDeviceOnline will check if device is online

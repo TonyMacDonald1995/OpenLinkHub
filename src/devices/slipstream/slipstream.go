@@ -27,6 +27,7 @@ import (
 	"OpenLinkHub/src/devices/scimitarW"
 	"OpenLinkHub/src/logger"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/sstallion/go-hid"
 	"reflect"
@@ -95,8 +96,9 @@ func Init(vendorId, productId uint16, _, path string, callback func(device *comm
 	}
 
 	slipstream := &common.Slipstream{
-		Dev:   dev,
-		Mutex: sync.Mutex{},
+		Dev:       dev,
+		Mutex:     sync.Mutex{},
+		Connected: map[uint16]bool{},
 	}
 
 	// Init new struct with HID device
@@ -864,6 +866,7 @@ func (d *Device) initAvailableDevices() {
 				return
 			}
 			connect.Call(nil)
+			d.slipstream.Connected[value.ProductId] = true
 		}
 	}
 }
@@ -905,10 +908,12 @@ func (d *Device) setDeviceStatus(status byte, productId uint16) {
 					reflectArgs := make([]reflect.Value, 1)
 					reflectArgs[0] = reflect.ValueOf(false)
 					setConnected.Call(reflectArgs)
+					d.slipstream.Connected[v.ProductId] = false
 				case 0x02:
 					go func() {
 						time.Sleep(time.Duration(connectDelay) * time.Millisecond)
 						connect.Call(nil)
+						d.slipstream.Connected[v.ProductId] = true
 					}()
 				}
 			}
@@ -932,6 +937,7 @@ func (d *Device) setDeviceStatus(status byte, productId uint16) {
 						reflectArgs := make([]reflect.Value, 1)
 						reflectArgs[0] = reflect.ValueOf(false)
 						setConnected.Call(reflectArgs)
+						d.slipstream.Connected[val.ProductId] = false
 					case 0x02:
 						//
 					case 0x04:
@@ -939,27 +945,32 @@ func (d *Device) setDeviceStatus(status byte, productId uint16) {
 							go func() {
 								time.Sleep(time.Duration(connectDelay) * time.Millisecond)
 								connect.Call(nil)
+								d.slipstream.Connected[val.ProductId] = true
 							}()
 						} else {
 							reflectArgs := make([]reflect.Value, 1)
 							reflectArgs[0] = reflect.ValueOf(false)
 							setConnected.Call(reflectArgs)
+							d.slipstream.Connected[val.ProductId] = false
 						}
 					case 0x08:
 						if val.DeviceType == common.DeviceTypeKeyboard {
 							go func() {
 								time.Sleep(time.Duration(connectDelay) * time.Millisecond)
 								connect.Call(nil)
+								d.slipstream.Connected[val.ProductId] = true
 							}()
 						} else {
 							reflectArgs := make([]reflect.Value, 1)
 							reflectArgs[0] = reflect.ValueOf(false)
 							setConnected.Call(reflectArgs)
+							d.slipstream.Connected[val.ProductId] = false
 						}
 					case 0x0c:
 						go func() {
 							time.Sleep(time.Duration(connectDelay) * time.Millisecond)
 							connect.Call(nil)
+							d.slipstream.Connected[val.ProductId] = true
 						}()
 					}
 				}
@@ -984,24 +995,26 @@ func (d *Device) monitorDevice() {
 						logger.Log(logger.Fields{"error": err}).Error("Unable to read slipstream endpoint")
 					}
 					for _, value := range d.Devices {
-						_, e := d.transfer(value.Endpoint, cmdHeartbeat, nil)
-						if e != nil {
-							if d.Debug {
-								logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint")
+						if d.slipstream.Connected[value.ProductId] {
+							_, e := d.transfer(value.Endpoint, cmdHeartbeat, nil)
+							if e != nil {
+								if d.Debug {
+									logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint")
+								}
+								continue
 							}
-							continue
-						}
 
-						batteryLevel, e := d.transfer(value.Endpoint, cmdBatteryLevel, nil)
-						if e != nil {
-							if d.Debug {
-								logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint for battery status")
+							batteryLevel, e := d.transfer(value.Endpoint, cmdBatteryLevel, nil)
+							if e != nil {
+								if d.Debug {
+									logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint for battery status")
+								}
+								continue
 							}
-							continue
-						}
-						val := binary.LittleEndian.Uint16(batteryLevel[3:5])
-						if val > 0 {
-							d.setDeviceBatteryLevelByProductId(value.ProductId, val/10)
+							val := binary.LittleEndian.Uint16(batteryLevel[3:5])
+							if val > 0 {
+								d.setDeviceBatteryLevelByProductId(value.ProductId, val/10)
+							}
 						}
 					}
 				}
@@ -1044,29 +1057,32 @@ func (d *Device) sleepMonitor() {
 						return
 					}
 					for _, value := range d.Devices {
-						msg, err := d.transfer(value.Endpoint, cmdInactivity, nil)
-						if err != nil {
-							if d.Debug {
-								logger.Log(logger.Fields{"error": err}).Error("Unable to read device endpoint")
+						if d.slipstream.Connected[value.ProductId] {
+							msg, err := d.transfer(value.Endpoint, cmdInactivity, nil)
+							if err != nil {
+								if d.Debug {
+									logger.Log(logger.Fields{"error": err}).Error("Unable to read device endpoint")
+								}
+								continue
 							}
-							continue
-						}
-						if (msg[0] == 0x02 || msg[0] == 0x01) && msg[1] == 0x02 { // Mouse // Connected
-							inactive := int(binary.LittleEndian.Uint16(msg[3:5]))
-							if inactive > 0 {
-								if dev, ok := d.PairedDevices[value.ProductId]; ok {
-									sleepMode := d.getSleepMode(dev) * 60
-									if sleepMode > 0 {
-										methodName := "SetSleepMode"
-										method := reflect.ValueOf(dev).MethodByName(methodName)
-										if !method.IsValid() {
-											if d.Debug {
-												logger.Log(logger.Fields{"method": methodName}).Warn("Method not found or method is not supported for this device type")
-											}
-											continue
-										} else {
-											if inactive >= sleepMode {
-												method.Call(nil)
+							if (msg[0] == 0x02 || msg[0] == 0x01) && msg[1] == 0x02 { // Mouse // Connected
+								inactive := int(binary.LittleEndian.Uint16(msg[3:5]))
+								if inactive > 0 {
+									if dev, ok := d.PairedDevices[value.ProductId]; ok {
+										sleepMode := d.getSleepMode(dev) * 60
+										if sleepMode > 0 {
+											methodName := "SetSleepMode"
+											method := reflect.ValueOf(dev).MethodByName(methodName)
+											if !method.IsValid() {
+												if d.Debug {
+													logger.Log(logger.Fields{"method": methodName}).Warn("Method not found or method is not supported for this device type")
+												}
+												continue
+											} else {
+												if inactive >= sleepMode {
+													d.slipstream.Connected[value.ProductId] = false
+													method.Call(nil)
+												}
 											}
 										}
 									}
@@ -1231,6 +1247,10 @@ func (d *Device) backendListener() {
 
 // transfer will send data to a device and retrieve device output
 func (d *Device) transfer(command byte, endpoint, buffer []byte) ([]byte, error) {
+	if d.slipstream == nil || d.slipstream.Dev == nil {
+		return nil, errors.New("slipstream device is not initialized")
+	}
+
 	d.slipstream.Mutex.Lock()
 	defer d.slipstream.Mutex.Unlock()
 
@@ -1273,20 +1293,24 @@ func (d *Device) transfer(command byte, endpoint, buffer []byte) ([]byte, error)
 		if d.Debug {
 			logger.Log(logger.Fields{"error": e, "serial": d.Serial}).Error("Unable to write to a device")
 		}
-		return bufferR, err
+		return bufferR, e
 	}
 
 	if _, e := d.slipstream.Dev.ReadWithTimeout(bufferR, time.Duration(transferTimeout)*time.Millisecond); e != nil {
 		if d.Debug {
 			logger.Log(logger.Fields{"error": e, "serial": d.Serial}).Error("Unable to read data from device")
 		}
-		return bufferR, err
+		return bufferR, e
 	}
 	return bufferR, nil
 }
 
 // transfer will send data to a device and retrieve device output
 func (d *Device) transferToDevice(command byte, endpoint, buffer []byte, caller string) ([]byte, error) {
+	if d.slipstream == nil || d.slipstream.Dev == nil {
+		return nil, errors.New("slipstream device is not initialized")
+	}
+
 	d.slipstream.Mutex.Lock()
 	defer d.slipstream.Mutex.Unlock()
 

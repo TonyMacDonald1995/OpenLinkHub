@@ -289,10 +289,14 @@ func (d *Device) setGamepadSerial() {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	if d.activeRgb != nil {
-		d.activeRgb.Exit <- true
+	if d.Connected {
+		if d.activeRgb != nil {
+			d.activeRgb.Exit <- true
+			d.activeRgb = nil
+		}
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
 	}
-	d.Connected = value
 }
 
 // Connect will connect to a device
@@ -705,7 +709,7 @@ func (d *Device) UpdateRgbProfileData(profileName string, profile rgb.Profile) u
 	if !d.Connected {
 		return 0
 	}
-	
+
 	if d.GetRgbProfile(profileName) == nil {
 		logger.Log(logger.Fields{"serial": d.Serial, "profile": profile}).Warn("Non-existing RGB profile")
 		return 0

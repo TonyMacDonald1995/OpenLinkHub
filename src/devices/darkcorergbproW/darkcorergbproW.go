@@ -309,15 +309,19 @@ func (d *Device) StopDirty() uint8 {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	if !value {
-		cluster.Get().RemoveDeviceControllerBySerial(d.Serial)
-		openrgb.RemoveDeviceControllerBySerial(d.Serial)
-	}
+	if d.Connected {
+		if !value {
+			cluster.Get().RemoveDeviceControllerBySerial(d.Serial)
+			openrgb.RemoveDeviceControllerBySerial(d.Serial)
+		}
 
-	if d.activeRgb != nil {
-		d.activeRgb.Exit <- true
+		if d.activeRgb != nil {
+			d.activeRgb.Exit <- true
+			d.activeRgb = nil
+		}
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
 	}
-	d.Connected = value
 }
 
 // checkDeviceOnline will check if device is online
@@ -1050,11 +1054,16 @@ func (d *Device) setButtonOptimization() {
 
 // SetSleepMode will switch a device to sleep mode
 func (d *Device) SetSleepMode() {
-	d.SetConnected(false)
+	d.deviceLock.Lock()
+	defer d.deviceLock.Unlock()
 
-	_, err := d.transfer(cmdSleepMode, nil)
-	if err != nil {
-		logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
+	if d.Connected {
+		d.SetConnected(false)
+
+		_, err := d.transfer(cmdSleepMode, nil)
+		if err != nil {
+			logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
+		}
 	}
 }
 

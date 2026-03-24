@@ -242,7 +242,10 @@ func (d *Device) StopDirty() uint8 {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	d.Connected = value
+	if d.Connected {
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
+	}
 }
 
 // checkDeviceOnline will check if device is online
@@ -811,11 +814,16 @@ func (d *Device) setSoftwareMode() {
 
 // SetSleepMode will switch a device to sleep mode
 func (d *Device) SetSleepMode() {
-	d.SetConnected(false)
+	d.deviceLock.Lock()
+	defer d.deviceLock.Unlock()
 
-	_, err := d.transfer(cmdSleepMode, nil)
-	if err != nil {
-		logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
+	if d.Connected {
+		d.SetConnected(false)
+
+		_, err := d.transfer(cmdSleepMode, nil)
+		if err != nil {
+			logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
+		}
 	}
 }
 

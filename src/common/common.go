@@ -29,9 +29,10 @@ import (
 )
 
 type Slipstream struct {
-	Dev      *hid.Device
-	Listener *hid.Device
-	Mutex    sync.Mutex
+	Dev       *hid.Device
+	Listener  *hid.Device
+	Mutex     sync.Mutex
+	Connected map[uint16]bool
 }
 
 type Device struct {

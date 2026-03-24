@@ -256,7 +256,10 @@ func (d *Device) Connect() {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	d.Connected = value
+	if d.Connected {
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
+	}
 }
 
 // Stop will stop all device operations and switch a device back to hardware mode
@@ -358,7 +361,7 @@ func (d *Device) SaveMouseDPI(stages map[int]uint16) uint8 {
 	if !d.Connected {
 		return 0
 	}
-	
+
 	i := 0
 	if d.DeviceProfile == nil {
 		return 0

@@ -290,10 +290,14 @@ func (d *Device) StopDirty() uint8 {
 
 // SetConnected will change connected status
 func (d *Device) SetConnected(value bool) {
-	if d.activeRgb != nil {
-		d.activeRgb.Exit <- true
+	if d.Connected {
+		if d.activeRgb != nil {
+			d.activeRgb.Exit <- true
+			d.activeRgb = nil
+		}
+		d.Connected = value
+		time.Sleep(1000 * time.Millisecond)
 	}
-	d.Connected = value
 }
 
 // checkDeviceOnline will check if device is online
