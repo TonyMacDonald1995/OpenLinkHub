@@ -70,6 +70,7 @@ var (
 	cmdLogin         = []byte{0x1b, 0x01}
 	cmdCommand       = byte(0x02)
 	cmdBase          = byte(0x01)
+	cmdDongle        = byte(0x00)
 	transferTimeout  = 100
 	connectDelay     = 10000
 )
@@ -339,7 +340,7 @@ func (d *Device) setDeviceLogin() {
 	buf := make([]byte, 4)
 	copy(buf[0:4], token[:])
 
-	_, err := d.transfer(cmdBase, cmdLogin, buf)
+	_, err := d.transfer(cmdDongle, cmdBase, cmdLogin, buf)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Fatal("Unable to perform device login")
 	}
@@ -347,7 +348,7 @@ func (d *Device) setDeviceLogin() {
 
 // getDeviceFirmware will return a firmware version out as string
 func (d *Device) getDeviceFirmware() {
-	fw, err := d.transfer(cmdCommand, cmdGetFirmware, nil)
+	fw, err := d.transfer(cmdDongle, cmdCommand, cmdGetFirmware, nil)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to write to a device")
 	}
@@ -358,7 +359,7 @@ func (d *Device) getDeviceFirmware() {
 
 // setHardwareMode will switch a device to hardware mode
 func (d *Device) setHardwareMode() {
-	_, err := d.transfer(cmdCommand, cmdHardwareMode, nil)
+	_, err := d.transfer(cmdDongle, cmdCommand, cmdHardwareMode, nil)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
 	}
@@ -366,14 +367,14 @@ func (d *Device) setHardwareMode() {
 
 // setSoftwareMode will switch a device to software mode
 func (d *Device) setSoftwareMode() {
-	_, err := d.transfer(cmdCommand, cmdSoftwareMode, nil)
+	_, err := d.transfer(cmdDongle, cmdCommand, cmdSoftwareMode, nil)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to change device mode")
 	}
 }
 
 func (d *Device) readNext() []byte {
-	buffer, err := d.transfer(cmdCommand, cmdRead, nil)
+	buffer, err := d.transfer(cmdDongle, cmdCommand, cmdRead, nil)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to read endpoint")
 	}
@@ -384,35 +385,35 @@ func (d *Device) readNext() []byte {
 func (d *Device) read(endpoint []byte) []byte {
 	var buffer []byte
 
-	_, err := d.transfer(cmdCommand, cmdCloseEndpoint, endpoint)
+	_, err := d.transfer(cmdDongle, cmdCommand, cmdCloseEndpoint, endpoint)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to close endpoint")
 	}
 
-	_, err = d.transfer(cmdCommand, cmdOpenEndpoint, endpoint)
+	_, err = d.transfer(cmdDongle, cmdCommand, cmdOpenEndpoint, endpoint)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to open endpoint")
 	}
 
-	_, err = d.transfer(cmdCommand, cmdWrite, endpoint)
+	_, err = d.transfer(cmdDongle, cmdCommand, cmdWrite, endpoint)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to open endpoint")
 	}
 
-	buffer, err = d.transfer(cmdCommand, cmdRead, endpoint)
+	buffer, err = d.transfer(cmdDongle, cmdCommand, cmdRead, endpoint)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to read endpoint")
 	}
 
 	for i := 1; i < int(buffer[5]); i++ {
-		next, e := d.transfer(cmdCommand, cmdRead, endpoint)
+		next, e := d.transfer(cmdDongle, cmdCommand, cmdRead, endpoint)
 		if e != nil {
 			logger.Log(logger.Fields{"error": err}).Error("Unable to read endpoint")
 		}
 		buffer = append(buffer, next[3:]...)
 	}
 
-	_, err = d.transfer(cmdCommand, cmdCloseEndpoint, nil)
+	_, err = d.transfer(cmdDongle, cmdCommand, cmdCloseEndpoint, nil)
 	if err != nil {
 		logger.Log(logger.Fields{"error": err}).Error("Unable to close endpoint")
 	}
@@ -563,13 +564,13 @@ func (d *Device) monitorDevice() {
 					if d.Exit {
 						return
 					}
-					_, err := d.transfer(cmdCommand, cmdHeartbeat, nil)
+					_, err := d.transfer(cmdDongle, cmdCommand, cmdHeartbeat, nil)
 					if err != nil {
 						logger.Log(logger.Fields{"error": err}).Error("Unable to read slipstream endpoint")
 					}
 					for _, value := range d.Devices {
 						if d.slipstream.Connected[value.ProductId] {
-							_, e := d.transfer(value.Endpoint, cmdHeartbeat, nil)
+							_, e := d.transfer(value.Endpoint, value.Endpoint, cmdHeartbeat, nil)
 							if e != nil {
 								if d.Debug {
 									logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint")
@@ -577,7 +578,7 @@ func (d *Device) monitorDevice() {
 								continue
 							}
 
-							batteryLevel, e := d.transfer(value.Endpoint, cmdBatteryLevel, nil)
+							batteryLevel, e := d.transfer(value.Endpoint, value.Endpoint, cmdBatteryLevel, nil)
 							if e != nil {
 								if d.Debug {
 									logger.Log(logger.Fields{"error": e}).Error("Unable to read paired device endpoint for battery status")
@@ -631,7 +632,7 @@ func (d *Device) sleepMonitor() {
 					}
 					for _, value := range d.Devices {
 						if d.slipstream.Connected[value.ProductId] {
-							msg, err := d.transfer(value.Endpoint, cmdInactivity, nil)
+							msg, err := d.transfer(value.Endpoint, value.Endpoint, cmdInactivity, nil)
 							if err != nil {
 								if d.Debug {
 									logger.Log(logger.Fields{"error": err}).Error("Unable to read device endpoint")
@@ -802,7 +803,7 @@ func (d *Device) backendListener() {
 					d.setDeviceStatus(value, productId)
 				} else {
 					if data[3] == 0x02 || data[3] == 0x05 {
-
+						fmt.Println(data)
 						switch data[0] {
 						case 1:
 							d.TriggerKeyboardKeyAssignment(data)
@@ -815,7 +816,7 @@ func (d *Device) backendListener() {
 }
 
 // transfer will send data to a device and retrieve device output
-func (d *Device) transfer(command byte, endpoint, buffer []byte) ([]byte, error) {
+func (d *Device) transfer(target, command byte, endpoint, buffer []byte) ([]byte, error) {
 	if d.slipstream == nil || d.slipstream.Dev == nil {
 		return nil, errors.New("slipstream device is not initialized")
 	}
@@ -824,6 +825,7 @@ func (d *Device) transfer(command byte, endpoint, buffer []byte) ([]byte, error)
 	defer d.slipstream.Mutex.Unlock()
 
 	bufferW := make([]byte, bufferSizeWrite)
+	bufferW[1] = target
 	bufferW[2] = 0x01
 	bufferW[3] = command
 	endpointHeaderPosition := bufferW[headerSize : headerSize+len(endpoint)]
