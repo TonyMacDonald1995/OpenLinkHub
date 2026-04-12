@@ -252,6 +252,8 @@ func random01(values ...float64) float64 {
 	return math.Abs(math.Mod(sum, 1.0))
 }
 
+func lerp(a, b, t float64) float64 { return a + (b-a)*t }
+
 // New will create new ActiveRGB struct for RGB control
 func New(
 	lightChannels int,

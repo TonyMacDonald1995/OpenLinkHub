@@ -195,7 +195,7 @@ func Init(vendorId, slipstreamId, productId uint16, dev *common.Slipstream, endp
 			2: "66 %",
 			3: "100 %",
 		},
-		Product: "IRONCLAW RGB",
+		Product: "IRONCLAW SE",
 		SleepModes: map[int]string{
 			1:  "1 minute",
 			5:  "5 minutes",
