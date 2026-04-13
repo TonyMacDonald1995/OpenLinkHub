@@ -553,7 +553,6 @@ func ProcessChangeSpeed(r *http.Request) *Payload {
 		results = devices.CallDeviceMethod(req.DeviceId, "UpdateSpeedProfileBulk", req.ChannelIds, req.Profile)
 	} else {
 		results = devices.CallDeviceMethod(req.DeviceId, "UpdateSpeedProfile", req.ChannelId, req.Profile)
-
 	}
 
 	if len(results) > 0 {
