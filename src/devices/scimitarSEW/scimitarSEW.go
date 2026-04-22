@@ -146,7 +146,7 @@ var (
 	headerWriteSize           = 4
 	keyAmount                 = 17
 	minDpiValue               = 100
-	maxDpiValue               = 26000
+	maxDpiValue               = 33000
 	rgbProfileUpgrade         = []string{"gradient", "pastelrainbow", "pastelspiralrainbow"}
 	rgbModes                  = []string{
 		"colorpulse",
