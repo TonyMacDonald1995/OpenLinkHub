@@ -19,6 +19,7 @@ var (
 	mutex    sync.RWMutex
 )
 
+// Init will create and load display configuration
 func Init() {
 	location = config.GetConfig().ConfigPath + "/display.json"
 
