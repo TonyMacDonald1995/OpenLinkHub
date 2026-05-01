@@ -1,5 +1,5 @@
 > [!NOTE]
-> If you’re using a Slipstream Wireless dongle and your device is on the supported list, but you still can't see it on the dashboard, you’ll need to re-pair your device with the dongle via iCUE.
+> If you’re using a Slipstream Wireless dongle and your device is on the supported list, but you still can't see it on the dashboard, you’ll need to re-pair your device with the dongle via iCUE. This is a one-time operation for the lifetime of your device.
 
 ## Supported devices
 | Device                        | PID                                                    | Sub Devices                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
