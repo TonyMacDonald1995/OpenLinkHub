@@ -19,6 +19,7 @@ Gerencie iluminação RGB, velocidades de ventiladores, métricas do sistema, be
 - [Memória DDR4 / DDR5](docs/memory-configuration_pt-BR.md)
 - [Placa-mãe PWM](docs/motherboard-pwm.md)
 - [Integração OpenRGB](openrgb/README.md)
+- [XENEON EDGE KDE](docs/xeneon-edge-kde.md)
 
 ![Interface Web](https://github.com/jurkovic-nikola/OpenLinkHub/blob/main/static/img/ui.png?raw=true)
 

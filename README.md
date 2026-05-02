@@ -21,6 +21,7 @@ Manage RGB lighting, fan speeds, system metrics, as well as keyboards, mice, and
 - [Memory DDR4 / DDR5](docs/memory-configuration.md)
 - [Motherboard PWM](docs/motherboard-pwm.md)
 - [OpenRGB Integration](openrgb/README.md)
+- [XENEON EDGE KDE](docs/xeneon-edge-kde.md)
 
 ![Web UI](https://github.com/jurkovic-nikola/OpenLinkHub/blob/main/static/img/ui.png?raw=true)
 
