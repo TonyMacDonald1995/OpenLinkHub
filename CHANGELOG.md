@@ -1,5 +1,22 @@
+## 2026-05-03
+
+* readme update (0ccdee3)
+* remote install (d7c78fb)
+* ccxt pump speed https://github.com/jurkovic-nikola/OpenLinkHub/issues/418 (67a92db)
+
+## 2026-05-02
+
+* xeneon edge touch for kde (98da564)
+
 ## 2026-05-01
 
+* arc, rain rgb modes for elite, platinum aio (6a0ce63)
+* arc, rain rgb modes for cc, ccxt, cpro, cduo (63b216c)
+* readme update (5bb6590)
+* header update (bba1d5d)
+* remove points from temperature profiles (8f5bd01)
+* package header update (1218fd9)
+* changelog (fbcb41b)
 * mouse position https://github.com/jurkovic-nikola/OpenLinkHub/issues/411 (a6da393)
 * controller update (1ca7fd9)
 * mpris dbus client (4c8efc6)
