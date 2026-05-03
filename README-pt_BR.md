@@ -42,6 +42,7 @@ This script will:
 - Copiar 99-openlinkhub.rules para /etc/udev/rules.d/
 - Iniciar o serviço após a instalação
 - Você pode usar este script para fins de instalação ou atualização
+- Antes de executar este script, desinstale quaisquer versões do OpenLinkHub instaladas anteriormente.
 
 ## Instalação (automática)
 1. Baixe o pacote .deb ou .rpm da versão mais recente, dependendo da sua distribuição Linux

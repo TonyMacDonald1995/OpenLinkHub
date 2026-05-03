@@ -43,6 +43,7 @@ This script will:
 - Copy 99-openlinkhub.rules to /etc/udev/rules.d/ 
 - Start the service after installation. 
 - You can use this script for installation or upgrade purposes.
+- Before running this script, uninstall any previously installed versions of OpenLinkHub
 
 ## Installation (automatic)
 1. Download either .deb or .rpm package from the latest Release, depending on your Linux distribution
