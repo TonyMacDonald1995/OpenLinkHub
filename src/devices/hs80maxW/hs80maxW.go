@@ -1017,7 +1017,7 @@ func (d *Device) saveDeviceProfile() {
 		deviceProfile.DisableMicIndicator = d.DeviceProfile.DisableMicIndicator
 		deviceProfile.SideTone = d.DeviceProfile.SideTone
 		deviceProfile.SideToneValue = d.DeviceProfile.SideToneValue
-
+		deviceProfile.KeyAssignmentHash = d.DeviceProfile.KeyAssignmentHash
 		if len(d.DeviceProfile.Path) < 1 {
 			deviceProfile.Path = profilePath
 			d.DeviceProfile.Path = profilePath
