@@ -42,14 +42,11 @@
         {{ $device := .Device.Instance }}
         {{ $WidgetAreas := $device.DeviceProfile.WidgetAreas }}
         <section class="edge-segment">
-            {{ $widget_1 := index $WidgetAreas 1 }}
-            {{ if $widget_1 }}
-            {{ .RenderTemplate $widget_1.Widget.Template . }}
+            {{ range $i := .Slice 1 2 }}
+            {{ $widget := index $WidgetAreas $i }}
+            {{ if $widget }}
+            {{ $.RenderTemplate $widget.Widget.Template $ }}
             {{ end }}
-
-            {{ $widget_2 := index $WidgetAreas 2 }}
-            {{ if $widget_2 }}
-            {{ .RenderTemplate $widget_2.Widget.Template . }}
             {{ end }}
         </section>
 
@@ -183,19 +180,11 @@
             </div>
         </section>
         <section class="edge-segment">
-            {{ $widget_9 := index $WidgetAreas 9 }}
-            {{ if $widget_9 }}
-            {{ .RenderTemplate $widget_9.Widget.Template . }}
+            {{ range $i := .Slice 9 10 11 }}
+            {{ $widget := index $WidgetAreas $i }}
+            {{ if $widget }}
+            {{ $.RenderTemplate $widget.Widget.Template $ }}
             {{ end }}
-
-            {{ $widget_10 := index $WidgetAreas 10 }}
-            {{ if $widget_10 }}
-            {{ .RenderTemplate $widget_10.Widget.Template . }}
-            {{ end }}
-
-            {{ $widget_11 := index $WidgetAreas 11 }}
-            {{ if $widget_11 }}
-            {{ .RenderTemplate $widget_11.Widget.Template . }}
             {{ end }}
         </section>
     </div>
