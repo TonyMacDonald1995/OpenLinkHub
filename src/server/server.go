@@ -2363,7 +2363,7 @@ func uiSettings(w http.ResponseWriter, _ *http.Request) {
 
 // uiXeneon handles kiosk page
 func uiXeneon(w http.ResponseWriter, _ *http.Request) {
-	var xeneon = &common.Device{}
+	var xeneon *common.Device
 	for _, val := range devices.GetDevices() {
 		if val.ProductType == common.ProductTypeXeneonEdge {
 			xeneon = val
@@ -2373,9 +2373,10 @@ func uiXeneon(w http.ResponseWriter, _ *http.Request) {
 	if xeneon == nil {
 		resp := &Response{
 			Code:    http.StatusInternalServerError,
-			Message: language.GetValue("txtUnableToServeWebContent"),
+			Message: language.GetValue("txtXeneonEdgeUnavailable"),
 		}
 		resp.Send(w)
+		return
 	}
 
 	deviceList := devices.GetDevices()

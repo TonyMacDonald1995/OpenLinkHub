@@ -630,6 +630,7 @@
     "txtAbsolute": "Absolut",
     "txtMousePositionX": "Mausposition X",
     "txtMousePositionY": "Mausposition Y",
-    "txtInvalidMousePosition": "Ungültige Mausposition"
+    "txtInvalidMousePosition": "Ungültige Mausposition",
+    "txtXeneonEdgeUnavailable": "Xeneon Edge ist nicht verfügbar"
   }
 }

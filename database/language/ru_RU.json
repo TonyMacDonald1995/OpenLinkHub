@@ -630,6 +630,7 @@
         "txtAbsolute": "Абсолютное",
         "txtMousePositionX": "Положение мыши X",
         "txtMousePositionY": "Положение мыши Y",
-        "txtInvalidMousePosition": "Недопустимое положение мыши"
+        "txtInvalidMousePosition": "Недопустимое положение мыши",
+        "txtXeneonEdgeUnavailable": "Xeneon Edge недоступен"
     }
 }
