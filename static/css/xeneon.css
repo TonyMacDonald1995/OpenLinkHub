@@ -376,7 +376,7 @@ body.edge-dashboard {
 .metric-row .name {
     font-family: "Teko", sans-serif;
     color: var(--text-muted);
-    font-size: 30px;
+    font-size: 25px;
 }
 .metric-bar {
     position: relative;
@@ -548,15 +548,18 @@ code {
 }
 
 .calendar-nav {
-    width: 30px;
-    height: 30px;
+    width: 40px;
+    height: 40px;
     border: 0;
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.08);
     color: rgba(255, 255, 255, 0.85);
     cursor: pointer;
     font-size: 22px;
-    line-height: 1;
+}
+
+.calendar-nav-arrow {
+
 }
 
 .calendar-nav:hover {

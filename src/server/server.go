@@ -2363,6 +2363,21 @@ func uiSettings(w http.ResponseWriter, _ *http.Request) {
 
 // uiXeneon handles kiosk page
 func uiXeneon(w http.ResponseWriter, _ *http.Request) {
+	var xeneon = &common.Device{}
+	for _, val := range devices.GetDevices() {
+		if val.ProductType == common.ProductTypeXeneonEdge {
+			xeneon = val
+		}
+	}
+
+	if xeneon == nil {
+		resp := &Response{
+			Code:    http.StatusInternalServerError,
+			Message: language.GetValue("txtUnableToServeWebContent"),
+		}
+		resp.Send(w)
+	}
+
 	deviceList := devices.GetDevices()
 	web := templates.Web{}
 	web.Title = dashboard.GetDashboard().PageTitle
@@ -2373,6 +2388,7 @@ func uiXeneon(w http.ResponseWriter, _ *http.Request) {
 	web.GpuTemp = dashboard.GetDashboard().TemperatureToString(temperatures.GetGpuTemperature())
 	web.Dashboard = dashboard.GetDashboard()
 	web.BatteryStats = stats.GetBatteryStats()
+	web.Device = xeneon
 	web.Page = "xeneon"
 
 	t := templates.GetTemplate()

@@ -38,7 +38,6 @@ type Device struct {
 	UserProfiles    map[string]*DeviceProfile `json:"userProfiles"`
 	Devices         map[int]string            `json:"devices"`
 	Widgets         []Widget                  `json:"widgets"`
-	WidgetAreas     map[int]WidgetArea
 	DeviceProfile   *DeviceProfile
 	OriginalProfile *DeviceProfile
 	Template        string
@@ -267,6 +266,7 @@ func (d *Device) saveDeviceProfile() {
 
 	// First save, assign saved profile to a device
 	if d.DeviceProfile == nil {
+		deviceProfile.Active = true
 		deviceProfile.WidgetAreas = map[int]WidgetArea{
 			1: {
 				WidgetId: 1,
@@ -275,6 +275,36 @@ func (d *Device) saveDeviceProfile() {
 			2: {
 				WidgetId: 1,
 				Widget:   d.getWidget(2),
+			},
+			3: {
+				WidgetId: 0,
+			},
+			4: {
+				WidgetId: 0,
+			},
+			5: {
+				WidgetId: 0,
+			},
+			6: {
+				WidgetId: 0,
+			},
+			7: {
+				WidgetId: 0,
+			},
+			8: {
+				WidgetId: 0,
+			},
+			9: {
+				WidgetId: 3,
+				Widget:   d.getWidget(3),
+			},
+			10: {
+				WidgetId: 5,
+				Widget:   d.getWidget(5),
+			},
+			11: {
+				WidgetId: 4,
+				Widget:   d.getWidget(4),
 			},
 		}
 	} else {
@@ -285,6 +315,7 @@ func (d *Device) saveDeviceProfile() {
 		} else {
 			deviceProfile.Path = d.DeviceProfile.Path
 		}
+		deviceProfile.WidgetAreas = d.DeviceProfile.WidgetAreas
 	}
 
 	// Convert to JSON
