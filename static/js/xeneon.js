@@ -32,7 +32,7 @@ $(document).ready(function () {
     });
 
     // System clock
-    if ($('#system-clock').length) {
+    if ($('#xeneon-clock').length) {
         function formatClock() {
             const now = new Date();
             $('#clockTime').text(now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
@@ -43,7 +43,7 @@ $(document).ready(function () {
     }
 
     // System weather
-    if ($('#system-weather').length) {
+    if ($('#xeneon-weather').length) {
         const WEATHER_REFRESH_MS = 10 * 60 * 1000;
         const FALLBACK_LOCATION = {
             name: 'New York',
@@ -228,7 +228,7 @@ $(document).ready(function () {
     }
 
     // Media Player
-    if ($('#media-player').length) {
+    if ($('#xeneon-media-player').length) {
         setInterval(function () {
             $.ajax({
                 url: '/api/media/playback',
@@ -320,9 +320,9 @@ $(document).ready(function () {
     }
 
     // Battery
-    if ($('#battery-status').length) {
+    if ($('#xeneon-battery-status').length) {
         function updateBatteryStatus(json) {
-            const $list = $('#battery-status .metrics-list');
+            const $list = $('#xeneon-battery-status .metrics-list');
             $list.empty();
 
             $.each(json.data.battery, function (deviceId, device) {
@@ -355,5 +355,107 @@ $(document).ready(function () {
                 }
             });
         }, 1000);
+    }
+
+    // Calendar
+    if ($('#xeneon-calendar').length) {
+        let viewDate = new Date();
+
+        function pad(n) {
+            return String(n).padStart(2, '0');
+        }
+
+        function formatFullDate(date) {
+            return date.toLocaleDateString('en-US', {
+                weekday: 'long',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        function formatMonth(date) {
+            return date.toLocaleDateString('en-US', {
+                month: 'long',
+                year: 'numeric'
+            });
+        }
+
+        function isSameDate(a, b) {
+            return (
+                a.getFullYear() === b.getFullYear() &&
+                a.getMonth() === b.getMonth() &&
+                a.getDate() === b.getDate()
+            );
+        }
+
+        function renderCalendar() {
+            const today = new Date();
+
+            const year = viewDate.getFullYear();
+            const month = viewDate.getMonth();
+
+            const firstDay = new Date(year, month, 1);
+            const lastDay = new Date(year, month + 1, 0);
+
+            // Monday-first calendar offset
+            const startOffset = (firstDay.getDay() + 6) % 7;
+
+            const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+            const $days = $('#calendarDays');
+            $days.empty();
+
+            $('#calendarMonth').text(formatMonth(viewDate));
+            $('#calendarToday').text(formatFullDate(today));
+
+            for (let i = 0; i < 42; i++) {
+                let dayNumber;
+                let cellDate;
+                let muted = false;
+
+                if (i < startOffset) {
+                    dayNumber = prevMonthLastDay - startOffset + i + 1;
+                    cellDate = new Date(year, month - 1, dayNumber);
+                    muted = true;
+                } else if (i >= startOffset + lastDay.getDate()) {
+                    dayNumber = i - startOffset - lastDay.getDate() + 1;
+                    cellDate = new Date(year, month + 1, dayNumber);
+                    muted = true;
+                } else {
+                    dayNumber = i - startOffset + 1;
+                    cellDate = new Date(year, month, dayNumber);
+                }
+
+                const isWeekend = cellDate.getDay() === 0 || cellDate.getDay() === 6;
+
+                const $day = $('<div>', {
+                    class: 'calendar-day',
+                    text: dayNumber
+                });
+
+                if (muted) $day.addClass('is-muted');
+                if (isWeekend) $day.addClass('is-weekend');
+                if (isSameDate(cellDate, today)) $day.addClass('is-today');
+
+                $days.append($day);
+            }
+        }
+
+        $('#calendarPrev').on('click', function () {
+            viewDate.setMonth(viewDate.getMonth() - 1);
+            renderCalendar();
+        });
+
+        $('#calendarNext').on('click', function () {
+            viewDate.setMonth(viewDate.getMonth() + 1);
+            renderCalendar();
+        });
+
+        renderCalendar();
+
+        // Refresh at midnight-ish so "today" updates while dashboard is open
+        setInterval(function () {
+            renderCalendar();
+        }, 60 * 1000);
     }
 });

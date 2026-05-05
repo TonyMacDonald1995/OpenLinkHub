@@ -272,6 +272,10 @@ func (d *Device) saveDeviceProfile() {
 				WidgetId: 1,
 				Widget:   d.getWidget(1),
 			},
+			2: {
+				WidgetId: 1,
+				Widget:   d.getWidget(2),
+			},
 		}
 	} else {
 		deviceProfile.Active = d.DeviceProfile.Active
