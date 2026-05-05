@@ -376,7 +376,7 @@ body.edge-dashboard {
 .metric-row .name {
     font-family: "Teko", sans-serif;
     color: var(--text-muted);
-    font-size: 25px;
+    font-size: 30px;
 }
 .metric-bar {
     position: relative;

@@ -318,4 +318,42 @@ $(document).ready(function () {
             $('#trackProgress span').css('width', progress + '%');
         }
     }
+
+    // Battery
+    if ($('#battery-status').length) {
+        function updateBatteryStatus(json) {
+            const $list = $('#battery-status .metrics-list');
+            $list.empty();
+
+            $.each(json.data.battery, function (deviceId, device) {
+                const name = device.Device || deviceId;
+                const level = Math.max(0, Math.min(100, Number(device.Level) || 0));
+                const html = `
+                  <div class="metric-row" data-device-id="${deviceId}">
+                    <span class="name"></span>
+                    <span class="metric-value">${level}%</span>
+                    <div class="metric-bar" style="--fill:${level}%"><span></span></div>
+                  </div>
+                `;
+                const $row = $(html);
+                $row.find('.name').text(name);
+                $list.append($row);
+            });
+        }
+        setInterval(function () {
+            $.ajax({
+                url: '/api/systray',
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 1 && response.data) {
+                        updateBatteryStatus(response)
+                    }
+                },
+                error: function () {
+                    console.error('Failed to get media playback');
+                }
+            });
+        }, 1000);
+    }
 });
