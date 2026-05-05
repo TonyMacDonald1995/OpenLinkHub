@@ -822,6 +822,46 @@ func getMediaPlayback(w http.ResponseWriter, _ *http.Request) {
 	resp.Send(w)
 }
 
+// getMediaPlayback will return active media playback
+func mediaPlaybackControl(w http.ResponseWriter, r *http.Request) {
+	resp := &Response{Code: http.StatusOK, Status: 0}
+	mediaPlaybackAction, valid := getVar("/api/media/", r)
+	if !valid {
+		resp.Message = "Invalid playback action"
+	} else {
+		resp.Status = 1
+		resp.Message = "OK"
+
+		switch mediaPlaybackAction {
+		case "previous":
+			inputmanager.InputControlKeyboard(inputmanager.MediaPrev, false)
+			break
+		case "stop":
+			inputmanager.InputControlKeyboard(inputmanager.MediaStop, false)
+			break
+		case "play":
+			inputmanager.InputControlKeyboard(inputmanager.MediaPrev, false)
+			break
+		case "next":
+			inputmanager.InputControlKeyboard(inputmanager.MediaNext, false)
+			break
+		case "volumeDown":
+			inputmanager.InputControlKeyboard(inputmanager.VolumeDown, false)
+			break
+		case "volumeUp":
+			inputmanager.InputControlKeyboard(inputmanager.VolumeUp, false)
+			break
+		case "mute":
+			inputmanager.InputControlKeyboard(inputmanager.VolumeMute, false)
+			break
+		default:
+			resp.Message = "Invalid playback action"
+			resp.Status = 0
+		}
+	}
+	resp.Send(w)
+}
+
 // updateDeviceEqualizers handles device equalizer update
 func updateDeviceEqualizers(w http.ResponseWriter, r *http.Request) {
 	request := requests.ProcessUpdateDeviceEqualizer(r)
@@ -2321,6 +2361,36 @@ func uiSettings(w http.ResponseWriter, _ *http.Request) {
 	}
 }
 
+// uiXeneon handles kiosk page
+func uiXeneon(w http.ResponseWriter, _ *http.Request) {
+	deviceList := devices.GetDevices()
+	web := templates.Web{}
+	web.Title = dashboard.GetDashboard().PageTitle
+	web.Devices = deviceList
+	web.BuildInfo = version.GetBuildInfo()
+	web.SystemInfo = systeminfo.GetInfo()
+	web.CpuTemp = dashboard.GetDashboard().TemperatureToString(temperatures.GetCpuTemperature())
+	web.GpuTemp = dashboard.GetDashboard().TemperatureToString(temperatures.GetGpuTemperature())
+	web.Dashboard = dashboard.GetDashboard()
+	web.BatteryStats = stats.GetBatteryStats()
+	web.Page = "xeneon"
+
+	t := templates.GetTemplate()
+	for header := range headers {
+		w.Header().Set(headers[header].Key, headers[header].Value)
+	}
+
+	err := t.ExecuteTemplate(w, "xeneon.html", web)
+	if err != nil {
+		fmt.Println(err)
+		resp := &Response{
+			Code:    http.StatusInternalServerError,
+			Message: language.GetValue("txtUnableToServeWebContent"),
+		}
+		resp.Send(w)
+	}
+}
+
 // getVar will extract dynamic path from GET request
 func getVar(path string, r *http.Request) (string, bool) {
 	value := strings.TrimPrefix(r.URL.Path, path)
@@ -2416,6 +2486,7 @@ func setRoutes() http.Handler {
 	handleFunc(r, "/api/devices/probes/", http.MethodGet, getTemperatureProbes)
 	handleFunc(r, "/api/devices/mouse", http.MethodGet, getMouseDevice)
 	handleFunc(r, "/api/media/playback", http.MethodGet, getMediaPlayback)
+	handleFunc(r, "/api/media/", http.MethodGet, mediaPlaybackControl)
 
 	// POST
 	handleFunc(r, "/api/temperatures/new", http.MethodPost, newTemperatureProfile)
@@ -2481,6 +2552,7 @@ func setRoutes() http.Handler {
 	handleFunc(r, "/api/mouse/leftHandMode", http.MethodPost, changeLeftHandMode)
 	handleFunc(r, "/api/mouse/liftHeight", http.MethodPost, changeLiftHeight)
 	handleFunc(r, "/api/mouse/updateKeyAssignment", http.MethodPost, changeKeyAssignment)
+	handleFunc(r, "/api/headset/updateKeyAssignment", http.MethodPost, changeKeyAssignment)
 	handleFunc(r, "/api/headset/zoneColors", http.MethodPost, saveHeadsetZoneColors)
 	handleFunc(r, "/api/headset/sleep", http.MethodPost, changeSleepMode)
 	handleFunc(r, "/api/headset/muteIndicator", http.MethodPost, changeMuteIndicator)
@@ -2548,6 +2620,7 @@ func setRoutes() http.Handler {
 		handleFunc(r, "/macros", http.MethodGet, uiMacrosOverview)
 		handleFunc(r, "/lcd", http.MethodGet, uiLcdOverview)
 		handleFunc(r, "/settings", http.MethodGet, uiSettings)
+		//handleFunc(r, "/xeneon", http.MethodGet, uiXeneon)
 	}
 	return r
 }

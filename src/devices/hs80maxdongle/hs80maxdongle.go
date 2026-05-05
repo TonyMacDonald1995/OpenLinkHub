@@ -444,6 +444,15 @@ func (d *Device) backendListener() {
 					}
 				}
 
+				// Buttons
+				if data[0] == 0x03 && data[1] == 0x01 && data[2] == 0x02 {
+					for _, value := range d.PairedDevices {
+						if dev, found := value.(*hs80maxW.Device); found {
+							dev.TriggerKeyAssignment(data[3])
+						}
+					}
+				}
+
 				if data[1] == 0x00 && data[3] == 0x36 {
 					value := data[5]
 					d.setDeviceStatus(value)
