@@ -29,6 +29,30 @@
       "name": "Calendar",
       "template": "xeneon-calendar",
       "columns": [1,3]
+    },
+    {
+      "id": 6,
+      "name": "CPU Temperature",
+      "template": "xeneon-cpu-temp",
+      "columns": [2]
+    },
+    {
+      "id": 7,
+      "name": "CPU Load",
+      "template": "xeneon-cpu-load",
+      "columns": [2]
+    },
+    {
+      "id": 8,
+      "name": "GPU Temperature",
+      "template": "xeneon-gpu-temp",
+      "columns": [2]
+    },
+    {
+      "id": 9,
+      "name": "GPU Load",
+      "template": "xeneon-gpu-load",
+      "columns": [2]
     }
   ]
 }

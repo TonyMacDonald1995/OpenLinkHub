@@ -273,20 +273,24 @@ func (d *Device) saveDeviceProfile() {
 				Widget:   d.getWidget(1),
 			},
 			2: {
-				WidgetId: 1,
+				WidgetId: 2,
 				Widget:   d.getWidget(2),
 			},
 			3: {
-				WidgetId: 0,
+				WidgetId: 6,
+				Widget:   d.getWidget(6),
 			},
 			4: {
-				WidgetId: 0,
+				WidgetId: 7,
+				Widget:   d.getWidget(7),
 			},
 			5: {
-				WidgetId: 0,
+				WidgetId: 8,
+				Widget:   d.getWidget(8),
 			},
 			6: {
-				WidgetId: 0,
+				WidgetId: 9,
+				Widget:   d.getWidget(9),
 			},
 			7: {
 				WidgetId: 0,

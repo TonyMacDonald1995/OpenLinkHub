@@ -458,4 +458,142 @@ $(document).ready(function () {
             renderCalendar();
         }, 60 * 1000);
     }
+
+    // Gauge bars
+    const RADIUS = 46;
+    const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+
+    function clamp(num, min, max) {
+        return Math.min(Math.max(num, min), max);
+    }
+    function updateRing($widget, value, maxValue, options) {
+        const settings = $.extend({
+            unit: $widget.data('unit') || '',
+            label: $widget.data('label') || '',
+            color: $widget.data('color') || '#38bdf8',
+            decimals: 0
+        }, options || {});
+
+        const safeMax = Math.max(parseFloat(maxValue) || 100, 1);
+        const numericValue = parseFloat(value) || 0;
+        const percent = clamp((numericValue / safeMax) * 100, 0, 100);
+        const dashOffset = CIRCUMFERENCE * (1 - percent / 100);
+        const formattedValue = numericValue.toFixed(settings.decimals).replace(/\.0+$/, '');
+
+        $widget.attr('data-value', numericValue);
+        $widget.attr('data-max', safeMax);
+        $widget.find('.ring-progress').css({
+            stroke: settings.color,
+            strokeDasharray: CIRCUMFERENCE,
+            strokeDashoffset: dashOffset
+        });
+        $widget.find('.chart-value').text(formattedValue + settings.unit);
+        $widget.find('.chart-temp').text(formattedValue + settings.unit);
+        $widget.find('.chart-load').text(formattedValue + settings.unit);
+        $widget.find('.chart-label').text(settings.label);
+
+        const isWarning = percent >= 80;
+        $widget.toggleClass('is-warning', isWarning);
+        $widget.find('.small-label').first().toggleClass('is-hot', isWarning);
+    }
+
+    window.setThermalValue = function (selector, value, maxValue) {
+        const $widget = $(selector);
+        updateRing($widget, value, maxValue || $widget.data('max'));
+    };
+
+    window.updateThermalWidget = function (selector, payload) {
+        const $widget = $(selector);
+        updateRing($widget, payload.value, payload.max || $widget.data('max'), payload);
+
+        if (payload.load != null) $widget.find('.js-load').text(Math.round(payload.load) + '%');
+        if (payload.fan != null) $widget.find('.js-fan').text(Math.round(payload.fan) + ' RPM');
+        if (payload.limit != null) $widget.find('.js-limit').text(Math.round(payload.limit) + '°C');
+        if (payload.vram != null) $widget.find('.js-vram').text(Number(payload.vram).toFixed(1) + ' GB');
+        if (payload.hotspot != null) $widget.find('.js-hotspot').text(Math.round(payload.hotspot) + '°C');
+    };
+
+    // CPU Temp
+    if ($('#xeneon-cpu-temp').length) {
+        const $widget = $("#xeneon-cpu-temp");
+        setInterval(function () {
+            $.ajax({
+                url: '/api/cpuTemp/clean',
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 1 && response.data) {
+                        updateRing($widget, response.data, $widget.data('max'));
+                        setThermalValue($widget, response.data, $widget.data('max'));
+                    }
+                },
+                error: function () {
+                    console.error('Failed to get cpu temperature');
+                }
+            });
+        }, 1000);
+    }
+
+    // CPU Load
+    if ($('#xeneon-cpu-load').length) {
+        const $widget = $("#xeneon-cpu-load");
+        setInterval(function () {
+            $.ajax({
+                url: '/api/cpuLoad',
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 1 && response.data) {
+                        updateRing($widget, response.data, $widget.data('max'));
+                        setThermalValue($widget, response.data, $widget.data('max'));
+                    }
+                },
+                error: function () {
+                    console.error('Failed to get cpu load');
+                }
+            });
+        }, 1000);
+    }
+
+    // GPU Temp
+    if ($('#xeneon-gpu-temp').length) {
+        const $widget = $("#xeneon-gpu-temp");
+        setInterval(function () {
+            $.ajax({
+                url: '/api/gpuTemp/clean',
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 1 && response.data) {
+                        updateRing($widget, response.data, $widget.data('max'));
+                        setThermalValue($widget, response.data, $widget.data('max'));
+                    }
+                },
+                error: function () {
+                    console.error('Failed to get gpu temperature');
+                }
+            });
+        }, 1000);
+    }
+
+    // GPU Load
+    if ($('#xeneon-gpu-load').length) {
+        const $widget = $("#xeneon-gpu-load");
+        setInterval(function () {
+            $.ajax({
+                url: '/api/gpuLoad',
+                method: 'GET',
+                dataType: 'json',
+                success: function (response) {
+                    if (response.status === 1 && response.data) {
+                        updateRing($widget, response.data, $widget.data('max'));
+                        setThermalValue($widget, response.data, $widget.data('max'));
+                    }
+                },
+                error: function () {
+                    console.error('Failed to get gpu load');
+                }
+            });
+        }, 1000);
+    }
 });

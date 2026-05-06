@@ -132,6 +132,26 @@ func getGpuTemperatures(w http.ResponseWriter, _ *http.Request) {
 	resp.Send(w)
 }
 
+// getCpuLoad will return current cpu load
+func getCpuLoad(w http.ResponseWriter, _ *http.Request) {
+	resp := &Response{
+		Code:   http.StatusOK,
+		Status: 1,
+		Data:   systeminfo.GetCpuUtilization(),
+	}
+	resp.Send(w)
+}
+
+// getGpuLoad will return current gpu load
+func getGpuLoad(w http.ResponseWriter, _ *http.Request) {
+	resp := &Response{
+		Code:   http.StatusOK,
+		Status: 1,
+		Data:   systeminfo.GetGPUUtilization(),
+	}
+	resp.Send(w)
+}
+
 // getGpuTemperatureClean will return current gpu temperature in float value
 func getGpuTemperatureClean(w http.ResponseWriter, _ *http.Request) {
 	resp := &Response{
@@ -2468,9 +2488,11 @@ func setRoutes() http.Handler {
 	handleFunc(r, "/api/", http.MethodGet, homePage)
 	handleFunc(r, "/api/cpuTemp", http.MethodGet, getCpuTemperature)
 	handleFunc(r, "/api/cpuTemp/clean", http.MethodGet, getCpuTemperatureClean)
+	handleFunc(r, "/api/cpuLoad", http.MethodGet, getCpuLoad)
 	handleFunc(r, "/api/gpuTemp", http.MethodGet, getGpuTemperature)
 	handleFunc(r, "/api/gpuTemps", http.MethodGet, getGpuTemperatures)
 	handleFunc(r, "/api/gpuTemp/clean", http.MethodGet, getGpuTemperatureClean)
+	handleFunc(r, "/api/gpuLoad", http.MethodGet, getGpuLoad)
 	handleFunc(r, "/api/storageTemp", http.MethodGet, getStorageTemperature)
 	handleFunc(r, "/api/batteryStats", http.MethodGet, getBatteryStats)
 	handleFunc(r, "/api/devices/", http.MethodGet, getDevices)

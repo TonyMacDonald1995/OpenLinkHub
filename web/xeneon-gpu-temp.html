@@ -1,0 +1,23 @@
+{{ define "xeneon-gpu-temp" }}
+{{ $root := . }}
+<div class="card system-card thermal-widget" id="xeneon-gpu-temp" data-value="68" data-max="95" data-color="#FFC107">
+    <div class="card-body">
+        <div class="thermal-meta">
+            <div class="big-label">GPU Temperature</div>
+        </div>
+        <div class="ring-chart">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+                <circle class="ring-track" cx="60" cy="60" r="46"></circle>
+                <circle class="ring-progress" cx="60" cy="60" r="46"></circle>
+            </svg>
+            <div class="center">
+                <div class="small">
+                    <div class="thermal-temp chart-temp">0</div>
+                </div>
+                <div class="medium">°C</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{{ end }}
