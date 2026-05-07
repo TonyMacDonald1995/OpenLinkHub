@@ -38,9 +38,9 @@
 <body class="edge-dashboard">
 <div class="edge-shell">
     <div class="edge-layout">
-        {{ $root := . }}
         {{ $device := .Device.Instance }}
         {{ $WidgetAreas := $device.DeviceProfile.WidgetAreas }}
+
         <section class="edge-segment">
             {{ range $i := .Slice 1 2 }}
             {{ $widget := index $WidgetAreas $i }}
@@ -51,9 +51,14 @@
         </section>
 
         <section class="edge-segment">
+            {{ range $pair := .Slice (.Slice 3 4) (.Slice 5 6) (.Slice 7 8) }}
+            {{ $widget_1 := index $WidgetAreas (index $pair 0) }}
+            {{ $widget_2 := index $WidgetAreas (index $pair 1) }}
+
+            {{ if or $widget_1.Widget $widget_2.Widget }}
             <div class="edge-panel">
                 <div class="rings-grid">
-                    {{ range $i := .Slice 3 4 }}
+                    {{ range $i := $pair }}
                     {{ $widget := index $WidgetAreas $i }}
                     {{ if $widget.Widget }}
                     {{ $.RenderTemplate $widget.Widget.Template $ }}
@@ -61,59 +66,10 @@
                     {{ end }}
                 </div>
             </div>
-            <div class="edge-panel">
-                <div class="rings-grid">
-                    {{ range $i := .Slice 5 6 }}
-                    {{ $widget := index $WidgetAreas $i }}
-                    {{ if $widget.Widget }}
-                    {{ $.RenderTemplate $widget.Widget.Template $ }}
-                    {{ end }}
-                    {{ end }}
-                </div>
-            </div>
-            <div class="edge-panel">
-                <div class="rings-grid">
-                    <div class="card system-card thermal-widget" id="cpuWidget" data-value="68" data-max="95" data-color="#FFC107">
-                        <div class="card-body">
-                            <div class="thermal-meta">
-                                <div class="big-label">iCUE LINK TITAN 360 LCD</div>
-                            </div>
-                            <div class="ring-chart">
-                                <svg viewBox="0 0 120 120" aria-hidden="true">
-                                    <circle class="ring-track" cx="60" cy="60" r="46"></circle>
-                                    <circle class="ring-progress" cx="60" cy="60" r="46"></circle>
-                                </svg>
-                                <div class="center">
-                                    <div class="small">
-                                        <div class="thermal-temp">36.1</div>
-                                    </div>
-                                    <div class="medium">°C</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card system-card thermal-widget" id="gpuWidget" data-value="54" data-max="90" data-color="#38bdf8">
-                        <div class="card-body">
-                            <div class="thermal-meta">
-                                <div class="big-label">iCUE LINK TITAN 360 LCD</div>
-                            </div>
-                            <div class="ring-chart">
-                                <svg viewBox="0 0 120 120" aria-hidden="true">
-                                    <circle class="ring-track" cx="60" cy="60" r="46"></circle>
-                                    <circle class="ring-progress" cx="60" cy="60" r="46"></circle>
-                                </svg>
-                                <div class="center">
-                                    <div class="small">
-                                        <div class="thermal-temp">2451</div>
-                                    </div>
-                                    <div class="medium">RPM</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {{ end }}
+            {{ end }}
         </section>
+
         <section class="edge-segment">
             {{ range $i := .Slice 9 10 11 }}
             {{ $widget := index $WidgetAreas $i }}

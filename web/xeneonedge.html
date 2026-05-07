@@ -73,165 +73,52 @@
                         </div>
                     </div>
                 </div>
+                {{ $rows := .Slice
+                (.Slice (.Slice 4 1) (.Slice 2 3) (.Slice 2 4) (.Slice 4 9))
+                (.Slice (.Slice 4 0) (.Slice 2 5) (.Slice 2 6) (.Slice 4 10))
+                (.Slice (.Slice 4 2) (.Slice 2 7) (.Slice 2 8) (.Slice 4 11))
+                }}
+
                 <div class="col-md-10">
                     <div class="card system-card text-center">
                         <div class="card-body">
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-4">
+
+                            {{ range $rowIndex, $row := $rows }}
+                            <div class="row g-4{{ if ne $rowIndex 2 }} mb-4{{ end }}">
+
+                                {{ range $item := $row }}
+                                {{ $col := index $item 0 }}
+                                {{ $area := index $item 1 }}
+
+                                <div class="col-md-{{ $col }}">
+                                    {{ if ne $area 0 }}
                                     <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
                                         <div class="d-flex flex-column align-items-center gap-2">
                                             <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_1">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
+                                                <select class="form-select system-select auto-width widget-area-select" data-area="{{ $area }}">
+                                                    <option value="0">None</option>
+
+                                                    {{ range $key, $widget := $deviceProfile.WidgetAreas }}
+                                                    {{ if $widget.Widget }}
+                                                    {{ if eq $key $area }}
+                                                    <option value="{{ $key }}" selected>{{ $widget.Widget.Name }}</option>
+                                                    {{ else }}
+                                                    <option value="{{ $key }}">{{ $widget.Widget.Name }}</option>
+                                                    {{ end }}
+                                                    {{ end }}
+                                                    {{ end }}
                                                 </select>
                                             </div>
                                         </div>
                                     </div>
+                                    {{ end }}
                                 </div>
 
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_2">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                                {{ end }}
 
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_3">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_4">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-4"></div>
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_5">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_6">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_7">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="row g-4 mb-4">
-                                <div class="col-md-4">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_7">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            {{ end }}
 
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_8">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-2">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_9">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="col-md-4">
-                                    <div class="card p-3 xeneon-edge-panel d-flex justify-content-center align-items-center" style="min-height: 120px;">
-                                        <div class="d-flex flex-column align-items-center gap-2">
-                                            <div class="d-flex gap-2 align-items-center">
-                                                <select class="form-select system-select auto-width miscOptions" id="widget_10">
-                                                    <option value="0">{{ .Lang "txtCurrentArea" }}</option>
-                                                    <option value="1">{{ .Lang "txtCurrentRow" }}</option>
-                                                    <option value="2">{{ .Lang "txtAllRows" }}</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>

@@ -22,6 +22,7 @@ type DeviceProfile struct {
 	Product     string
 	Serial      string
 	WidgetAreas map[int]WidgetArea
+	RgbOff      bool
 }
 
 type WidgetArea struct {
