@@ -23,6 +23,7 @@ type DeviceProfile struct {
 	Serial      string
 	WidgetAreas map[int]WidgetArea
 	RgbOff      bool
+	Widgets     []Widget `json:"widgets"`
 }
 
 type WidgetArea struct {
@@ -48,10 +49,21 @@ type Device struct {
 }
 
 type Widget struct {
-	Id       int    `json:"id"`
-	Name     string `json:"name"`
-	Template string `json:"template"`
-	Columns  []int  `json:"columns"`
+	Id          int     `json:"id"`
+	Name        string  `json:"name"`
+	Template    string  `json:"template"`
+	Columns     []int   `json:"columns"`
+	City        string  `json:"city"`
+	Country     string  `json:"country"`
+	Latitude    float64 `json:"latitude"`
+	Longitude   float64 `json:"longitude"`
+	Source      string  `json:"source"`
+	AutoWeather bool    `json:"autoWeather"`
+	DataColor   string  `json:"dataColor"`
+	Max         int     `json:"max"`
+	HeaderText  string  `json:"headerText"`
+	Unit        string  `json:"unit"`
+	TextColor   string  `json:"textColor"`
 }
 
 var (
@@ -227,25 +239,6 @@ func (d *Device) getDebugMode() {
 	d.Debug = config.GetConfig().Debug
 }
 
-// getDeviceFirmware will return a device firmware version out as string
-func (d *Device) getDeviceFirmware() {
-	info, err := d.dev.GetDeviceInfo()
-	if err != nil {
-		logger.Log(logger.Fields{"error": err}).Error("Unable to get device info")
-		return
-	}
-	if info == nil {
-		logger.Log(logger.Fields{"error": err}).Error("Unable to get device info")
-		return
-	}
-
-	fw, err := common.GetBcdDevice(info.Path)
-	if err != nil {
-		logger.Log(logger.Fields{"error": err}).Error("Unable to get device firmware")
-	}
-	d.Firmware = fw
-}
-
 func (d *Device) getWidget(widgetId int) *Widget {
 	for _, widget := range d.Widgets {
 		if widget.Id == widgetId {
@@ -312,6 +305,7 @@ func (d *Device) saveDeviceProfile() {
 				Widget:   d.getWidget(4),
 			},
 		}
+		deviceProfile.Widgets = d.Widgets
 	} else {
 		deviceProfile.Active = d.DeviceProfile.Active
 		if len(d.DeviceProfile.Path) < 1 {
@@ -321,6 +315,7 @@ func (d *Device) saveDeviceProfile() {
 			deviceProfile.Path = d.DeviceProfile.Path
 		}
 		deviceProfile.WidgetAreas = d.DeviceProfile.WidgetAreas
+		deviceProfile.Widgets = d.DeviceProfile.Widgets
 	}
 
 	// Convert to JSON

@@ -462,10 +462,15 @@ $(document).ready(function () {
     // Gauge bars
     const RADIUS = 46;
     const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
+    const GAUGE_PERCENT = 0.85;
+    const GAUGE_LENGTH = CIRCUMFERENCE * GAUGE_PERCENT;
+    const GAUGE_GAP = CIRCUMFERENCE - GAUGE_LENGTH;
+    const GAUGE_ROTATION = 90 + ((1 - GAUGE_PERCENT) * 360 / 2);
 
     function clamp(num, min, max) {
         return Math.min(Math.max(num, min), max);
     }
+
     function updateRing($widget, value, maxValue, options) {
         const settings = $.extend({
             unit: $widget.data('unit') || '',
@@ -477,16 +482,27 @@ $(document).ready(function () {
         const safeMax = Math.max(parseFloat(maxValue) || 100, 1);
         const numericValue = parseFloat(value) || 0;
         const percent = clamp((numericValue / safeMax) * 100, 0, 100);
-        const dashOffset = CIRCUMFERENCE * (1 - percent / 100);
+        const dashOffset = GAUGE_LENGTH * (1 - percent / 100);
         const formattedValue = numericValue.toFixed(settings.decimals).replace(/\.0+$/, '');
 
         $widget.attr('data-value', numericValue);
         $widget.attr('data-max', safeMax);
+
+        $widget.find('svg').css({
+            transform: 'rotate(' + GAUGE_ROTATION + 'deg)'
+        });
+
+        $widget.find('.ring-track').css({
+            strokeDasharray: GAUGE_LENGTH + ' ' + CIRCUMFERENCE,
+            strokeDashoffset: 0
+        });
+
         $widget.find('.ring-progress').css({
             stroke: settings.color,
-            strokeDasharray: CIRCUMFERENCE,
+            strokeDasharray: GAUGE_LENGTH + ' ' + CIRCUMFERENCE,
             strokeDashoffset: dashOffset
         });
+
         $widget.find('.chart-value').text(formattedValue + settings.unit);
         $widget.find('.chart-temp').text(formattedValue + settings.unit);
         $widget.find('.chart-load').text(formattedValue + settings.unit);

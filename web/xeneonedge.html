@@ -9,6 +9,7 @@
     {{ $temperatures := .Temperatures }}
     {{ $device := .Device }}
     {{ $deviceProfile := .Device.DeviceProfile }}
+    {{ $txtConfigure := .Lang "txtConfigure" }}
     <input type="hidden" id="deviceId" name="deviceId" value="{{ $device.Serial }}">
 
     <div class="row">
@@ -22,7 +23,7 @@
             {{ template "temperature-bar" . }}
             {{ end }}
 
-            <!-- SABRE RGB PRO WIRELESS -->
+            <!-- XENEON EDGE -->
             <div class="row g-4 mb-4 align-items-start">
                 <div class="col-md-2">
                     <div class="card system-card text-center">
@@ -69,6 +70,18 @@
                                     <button class="system-button center saveUserProfile">{{ .Lang "txtSaveUserProfile" }}</button>
                                     <button class="system-button danger center deleteUserProfile">{{ .Lang "txtDeleteProfile" }}</button>
                                 </div>
+                            </div><br />
+
+                            <div class="settings-list">
+                                <!-- Widgets -->
+                                {{ range $key, $widget := $deviceProfile.Widgets }}
+                                <div class="settings-row">
+                                    <span class="settings-label text-ellipsis">{{ $widget.Name }}</span>
+                                    <label>
+                                        <button class="system-button center configureWidget" data-info="{{ $widget.Id }}">{{ $txtConfigure }}</button>
+                                    </label>
+                                </div>
+                                {{ end }}
                             </div>
                         </div>
                     </div>
@@ -113,12 +126,9 @@
                                     </div>
                                     {{ end }}
                                 </div>
-
                                 {{ end }}
-
                             </div>
                             {{ end }}
-
                         </div>
                     </div>
                 </div>

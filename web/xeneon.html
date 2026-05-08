@@ -45,7 +45,7 @@
             {{ range $i := .Slice 1 2 }}
             {{ $widget := index $WidgetAreas $i }}
             {{ if $widget.Widget }}
-            {{ $.RenderTemplate $widget.Widget.Template $ }}
+            {{ $.RenderTemplate $widget.Widget.Template ($.Dict "Root" $ "WidgetArea" $widget) }}
             {{ end }}
             {{ end }}
         </section>
@@ -61,7 +61,7 @@
                     {{ range $i := $pair }}
                     {{ $widget := index $WidgetAreas $i }}
                     {{ if $widget.Widget }}
-                    {{ $.RenderTemplate $widget.Widget.Template $ }}
+                    {{ $.RenderTemplate $widget.Widget.Template ($.Dict "Root" $ "WidgetArea" $widget) }}
                     {{ end }}
                     {{ end }}
                 </div>
@@ -74,7 +74,7 @@
             {{ range $i := .Slice 9 10 11 }}
             {{ $widget := index $WidgetAreas $i }}
             {{ if $widget.Widget }}
-            {{ $.RenderTemplate $widget.Widget.Template $ }}
+            {{ $.RenderTemplate $widget.Widget.Template ($.Dict "Root" $ "WidgetArea" $widget) }}
             {{ end }}
             {{ end }}
         </section>

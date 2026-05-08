@@ -276,13 +276,19 @@ body.edge-dashboard {
 .ring-chart svg {
     width: 100%;
     height: 100%;
-    transform: rotate(-90deg);
+    transform: rotate(135deg);
 }
 .ring-track,
 .ring-progress {
     fill: none;
     stroke-width: 10;
+    stroke-linecap: round;
 }
+
+.ring-progress {
+    transition: stroke-dashoffset 0.3s ease;
+}
+
 .ring-track {
     stroke: rgba(255, 255, 255, 0.08);
 }
@@ -476,7 +482,7 @@ code {
 }
 
 .thermal-temp {
-    font-size: 55px;
+    font-size: 80px;
     line-height: 1;
     color: var(--text-muted);
     font-family: "Teko", sans-serif;
@@ -498,10 +504,8 @@ code {
 }
 
 .ring-chart {
-    /*width: 188px;
-    height: 188px;*/
-    height: stretch;
-    width: stretch;
+    height: -webkit-fill-available;
+    width: -webkit-fill-available;
     position: relative;
     flex-shrink: 0;
     margin:0 20px 19px 20px;

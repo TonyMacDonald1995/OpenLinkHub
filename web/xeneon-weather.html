@@ -1,5 +1,7 @@
 {{ define "xeneon-weather" }}
-{{ $root := . }}
+{{ $root := .Root }}
+{{ $widgetArea := .WidgetArea }}
+{{ $widget := $widgetArea.Widget }}
 <div class="edge-panel" id="xeneon-weather">
     <div class="card system-card">
         <div class="card-body">
